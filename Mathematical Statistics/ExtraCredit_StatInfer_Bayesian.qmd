@@ -1,0 +1,71 @@
+---
+title: "ExtraCredit 19 April 2026"
+author: "Kasidet Khampuch"
+format: pdf
+editor: visual
+---
+
+# Question 1
+
+We found Approximate Distribution of Posteior Distribution for $$ \lambda|X_1 = 3, X_2 = 5, X_3 = 9 $$ likely chi square distribution. but we can't observe exact posterior distrubution because they simulation many time
+
+```{r}
+
+## Sample Distribution
+collection <- c()
+
+for (i in 1:30000){
+  ## Prior Distribution
+  lambda <- rchisq(n=1,df=5)
+  ## Sampling (Simulate) and Sorting
+  X <- sort(rpois(n = 3, lambda = lambda))
+  out <- c(lambda, X)
+  collection <- rbind(collection,out)
+}
+
+colnames(collection) <- c('lambda','x1','x2','x3')
+
+# Create Index when value match observe data
+idx <- (collection[,2]==3)&(collection[,3]==5)&(collection[,4]==9)
+
+hist(collection[idx,1]
+     ,main = 'Posteior Distribution of Lambda'
+     ,xlab = 'Lambda'
+     )
+```
+
+# Question 2
+
+99% Credible Interval of Lambda is
+
+```{r}
+lambda_lower <- quantile(collection[idx,1],0.005)
+lambda_upper <- quantile(collection[idx,1],1-0.005)
+
+print(lambda_lower)
+print(lambda_upper)
+```
+
+# Question 3
+
+We found
+
+$$
+P(\lambda \le 6| Posterior Distribution) > P(\lambda >  6| Posterior Distribution)
+$$
+
+Then we fail to reject null hypothesis.
+
+```{r}
+post_lambda <- collection[idx,1]
+
+# Calculate Prob for Null Hypothesis
+idx_h0 <- (post_lambda<=7)
+count_h0 <- length(post_lambda[idx_h0])
+prob_h0 <- count_h0/length(post_lambda)
+
+print(prob_h0)
+
+# Calculate Prob for Null Hypothesis
+print(1-prob_h0)
+```
